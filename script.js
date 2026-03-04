@@ -1,82 +1,92 @@
 const quiz = [
     {
-        question: "Was versteht man unter Gesellschaft?",
+        question: "Was ist eine Gesellschaft?",
         answers: [
-            "Eine Maschine",
             "Eine Gemeinschaft von Menschen",
-            "Ein Unternehmen",
-            "Eine Stadt"
+            "Eine Maschine",
+            "Ein Königreich",
+            "Ein Unternehmen"
         ],
-        correct: 1
+        correct: 0
     },
     {
-        question: "Wie lebten die meisten Menschen vor der Industriellen Revolution?",
+        question: "Wie arbeiteten Menschen vor der Industrialisierung?",
         answers: [
-            "In Großstädten",
-            "Als Fabrikarbeiter",
-            "Auf dem Land als Bauern",
-            "In Büros"
+            "In Büros",
+            "In großen Fabriken",
+            "In der Landwirtschaft",
+            "Mit Robotern"
         ],
         correct: 2
     },
     {
-        question: "Welche neue soziale Gruppe entstand während der Industrialisierung?",
+        question: "Warum zogen viele Menschen in Städte?",
         answers: [
-            "Ritter",
-            "Arbeiterklasse",
-            "Pharaonen",
-            "Gladiatoren"
+            "Urlaub",
+            "Fabrikarbeit",
+            "Kriege",
+            "Sport"
         ],
         correct: 1
-    },
-    {
-        question: "Warum zogen viele Menschen in die Städte?",
-        answers: [
-            "Wegen neuer Fabrikarbeit",
-            "Wegen Urlaub",
-            "Wegen Schlössern",
-            "Wegen Pferderennen"
-        ],
-        correct: 0
     }
 ];
 
 let currentQuestion = 0;
 let score = 0;
+let timeLeft = 10;
+let timer;
 
 function loadQuestion() {
-    const questionElement = document.getElementById("question");
-    const answersElement = document.getElementById("answers");
+    timeLeft = 10;
+    document.getElementById("timer").innerText = timeLeft;
 
-    questionElement.innerText = quiz[currentQuestion].question;
-    answersElement.innerHTML = "";
+    const q = quiz[currentQuestion];
+    document.getElementById("question").innerText = q.question;
 
-    quiz[currentQuestion].answers.forEach((answer, index) => {
+    const answersDiv = document.getElementById("answers");
+    answersDiv.innerHTML = "";
+
+    q.answers.forEach((answer, index) => {
         const button = document.createElement("button");
         button.innerText = answer;
-        button.onclick = () => checkAnswer(index);
-        answersElement.appendChild(button);
+        button.onclick = () => selectAnswer(index);
+        answersDiv.appendChild(button);
     });
+
+    startTimer();
 }
 
-function checkAnswer(index) {
+function startTimer() {
+    timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer").innerText = timeLeft;
+
+        if (timeLeft === 0) {
+            clearInterval(timer);
+            nextQuestion();
+        }
+    }, 1000);
+}
+
+function selectAnswer(index) {
+    clearInterval(timer);
+
     if (index === quiz[currentQuestion].correct) {
-        score++;
-        alert("Richtig!");
-    } else {
-        alert("Falsch!");
+        score += timeLeft * 10; // schneller = mehr Punkte
     }
+
+    nextQuestion();
 }
 
 function nextQuestion() {
     currentQuestion++;
+
     if (currentQuestion < quiz.length) {
         loadQuestion();
     } else {
-        document.getElementById("quiz-container").innerHTML =
-            `<h2>Quiz beendet!</h2>
-             <p>Deine Punktzahl: ${score} von ${quiz.length}</p>`;
-        document.getElementById("next-btn").style.display = "none";
+        document.getElementById("quiz-box").innerHTML =
+            `<h1>Quiz beendet!</h1>
+             <h2>Dein Score: ${score}</h2>`;
     }
 }
 
